@@ -7,7 +7,8 @@ var player,
 	DIR_DOWN = "DOWN",
 	DIR_RIGHT = "RIGHT",
 	DIR_LEFT = "LEFT",
-	SPAWNRATE=50;
+	SPAWNRATE=50,
+	COLLIDED = false;
 
 function Player(x, y, size){
 	this.x = x;
@@ -28,6 +29,7 @@ Player.prototype.show = function(){
 Player.prototype.update = function(){
 	this.x += this.dir.x * this.stride;
 	this.y += this.dir.y * this.stride;
+	this.realignEdge();
 }
 
 Player.prototype.resetDir = function(dir){
@@ -47,6 +49,21 @@ Player.prototype.moveY = function(dirY){
 Player.prototype.moveX = function(dirX){
 	dirX = dirToNum(dirX);
 	this.dir.x = dirX;
+}
+
+Player.prototype.realignEdge = function(){
+	if (this.x < 0){
+		this.x = 0;
+	}
+	if (this.x + this.size > width){
+		this.x = width - this.size;
+	}
+	if (this.y < 0){
+		this.y = 0;
+	}
+	if (this.y + this.size > height){
+		this.y = height - this.size;
+	}
 }
 
 Player.prototype.collide = function(enemy){
@@ -91,17 +108,21 @@ function setup(){
 }
 
 function draw(){
+	background(51);
 	enemies.forEach(function(enemy){
 		if(player.collide(enemy)){
-			console.log("HIT");
+			COLLIDED = true;
 		}
 	});
+	if(COLLIDED){
+		dispMsg("You lose!");
+		noLoop();
+	}
 	for(var i = enemies.length - 1; i >= 0; i--){
 		if(enemies[i].offScreen()){
 			enemies.splice(i,1);
 		}
 	}
-	background(51);
 	if(frameCount % SPAWNRATE === 0){
 		enemies.push(new Enemy());
 	}
@@ -145,4 +166,12 @@ function keyPressed(){
 	} else if (keyCode === LEFT_ARROW){
 		player.moveX(DIR_LEFT);
 	}
+}
+
+function dispMsg(msg){
+	background(51);
+	textSize(42);
+	textAlign("center");
+	fill(255, 0, 0);
+	text(msg, width/2, height/2);
 }
