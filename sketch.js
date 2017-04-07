@@ -6,7 +6,8 @@ var player,
 	DIR_UP = "UP",
 	DIR_DOWN = "DOWN",
 	DIR_RIGHT = "RIGHT",
-	DIR_LEFT = "LEFT";
+	DIR_LEFT = "LEFT",
+	SPAWNRATE=50;
 
 function Player(x, y, size){
 	this.x = x;
@@ -48,6 +49,18 @@ Player.prototype.moveX = function(dirX){
 	this.dir.x = dirX;
 }
 
+Player.prototype.collide = function(enemy){
+	if (
+		(enemy.x + enemy.size) < this.x ||
+		(enemy.y + enemy.size) < this.y ||
+		enemy.x > (this. x + this.size) ||
+		enemy.y > (this.y + this.size)
+	){ 
+		return false;
+	}
+	return true;
+}
+
 function Enemy(){
 	this.size = random(ENEMYMINSIZE, ENEMYMAXSIZE);
 	this.stride = random(0, 10);
@@ -78,13 +91,18 @@ function setup(){
 }
 
 function draw(){
+	enemies.forEach(function(enemy){
+		if(player.collide(enemy)){
+			console.log("HIT");
+		}
+	});
 	for(var i = enemies.length - 1; i >= 0; i--){
 		if(enemies[i].offScreen()){
 			enemies.splice(i,1);
 		}
 	}
 	background(51);
-	if(frameCount % 10 === 0){
+	if(frameCount % SPAWNRATE === 0){
 		enemies.push(new Enemy());
 	}
 	enemies.forEach(function(enemy){
