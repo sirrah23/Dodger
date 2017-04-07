@@ -8,7 +8,9 @@ var player,
 	DIR_RIGHT = "RIGHT",
 	DIR_LEFT = "LEFT",
 	SPAWNRATE=50,
-	COLLIDED = false;
+	SCORERATE = 100;
+	COLLIDED = false,
+	SCORE = 0;
 
 function Player(x, y, size){
 	this.x = x;
@@ -126,12 +128,16 @@ function draw(){
 	if(frameCount % SPAWNRATE === 0){
 		enemies.push(new Enemy());
 	}
+	if(frameCount % SCORERATE === 0){
+		SCORE++;
+	}
 	enemies.forEach(function(enemy){
 		enemy.update();
 		enemy.show();
 	});
 	player.update();
 	player.show();
+	dispScore();
 }
 
 function dirToNum(dir){
@@ -174,4 +180,13 @@ function dispMsg(msg){
 	textAlign("center");
 	fill(255, 0, 0);
 	text(msg, width/2, height/2);
+}
+
+function dispScore(){
+	push();
+	textSize(30);
+	textAlign("center");
+	fill(255);
+	text("Score: " + SCORE, 100, 50);
+	pop();
 }
